@@ -8,6 +8,11 @@ from .forms import NewAd
 
 def index(request):
     advertisers = Advertiser.objects.all()
+    for advertiser in advertisers:
+        for ad in advertiser.ads:
+            ad.views += 1
+            ad.save()
+
     return render(request, 'advertising/ads.html', {'advertisers': advertisers})
 
 
