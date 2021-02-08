@@ -1,45 +1,49 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView, RedirectView, CreateView
 
 from user.models import Advertiser
 from .models import Ad
 
-from .forms import NewAd
 
-
-def index(request):
+class IndexView(TemplateView):
+    template_name = 'advertising/ads.html'
     advertisers = Advertiser.objects.all()
-    for advertiser in advertisers:
-        for ad in advertiser.ads:
-            ad.views += 1
-            ad.save()
 
-    return render(request, 'advertising/ads.html', {'advertisers': advertisers})
+    @classmethod
+    def increaseView(cls):
+        for advertiser in cls.advertisers:
+            for ad in advertiser.ads:
+                ad.views += 1
+                ad.save()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.increaseView()
+        context['advertisers'] = self.advertisers
 
-def ad(request, ad_id):
-    ad = get_object_or_404(Ad, pk=ad_id)
-    ad.clicks += 1
-    ad.advertiser.clicks += 1
-    ad.advertiser.save()
-    ad.save()
-
-    return redirect(ad.link)
+        return context
 
 
-def new_ad(request):
-    if request.method == 'POST':
-        form = NewAd(request.POST, request.FILES)
-        if form.is_valid():
-            advertiser = get_object_or_404(Advertiser, pk=form.cleaned_data.get('advertiser_id'))
-            ad = Ad(
-                title=form.cleaned_data.get('title'),
-                link=form.cleaned_data.get('link'),
-                img=form.cleaned_data.get('image'),
-                advertiser=advertiser
-            )
-            ad.save()
+class AdView(RedirectView):
 
-    else:
-        form = NewAd()
+    def get_redirect_url(self, *args, **kwargs):
+        ad = get_object_or_404(Ad, pk=kwargs['ad_id'])
+        ad.clicks += 1
+        ad.advertiser.clicks += 1
+        ad.advertiser.save()
+        ad.save()
 
-    return render(request, 'advertising/new_ad.html', {'form': form})
+        self.url = ad.link
+
+        return super().get_redirect_url(*args, **kwargs)
+
+
+class NewAdView(CreateView):
+    model = Ad
+    fields = ['advertiser', 'title', 'link', 'img']
+    template_name = 'advertising/new_ad.html'
+    success_url = '../'
+
+    def form_valid(self, form):
+        print(self.request.user.id)
+        return super().form_valid(form)
