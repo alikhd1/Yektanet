@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, RedirectView, CreateView
 
 from user.models import Advertiser
-from .models import Ad
+from .models.ad import Ad
+from .models.tracking import EventTracking
 
 
 class IndexView(TemplateView):
@@ -13,8 +14,8 @@ class IndexView(TemplateView):
     def increaseView(cls):
         for advertiser in cls.advertisers:
             for ad in advertiser.ads:
-                ad.views += 1
-                ad.save()
+                tracker = EventTracking(ad=ad, event='vi')
+                tracker.save()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -28,10 +29,8 @@ class AdView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         ad = get_object_or_404(Ad, pk=kwargs['ad_id'])
-        ad.clicks += 1
-        ad.advertiser.clicks += 1
-        ad.advertiser.save()
-        ad.save()
+        tracker = EventTracking(ad=ad, event='ck')
+        tracker.save()
 
         self.url = ad.link
 
@@ -45,5 +44,4 @@ class NewAdView(CreateView):
     success_url = '../'
 
     def form_valid(self, form):
-        print(self.request.user.id)
         return super().form_valid(form)
