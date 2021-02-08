@@ -1,10 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 
 
-class Advertiser(models.Model):
-    name = models.CharField(max_length=100)
-    creation_date = models.DateTimeField(default=timezone.now)
+class Advertiser(User):
     clicks = models.IntegerField(verbose_name='کلیک ها', default=0)
     views = models.IntegerField(verbose_name='بازدید ها', default=0)
 
@@ -13,4 +11,4 @@ class Advertiser(models.Model):
         return self.ad_set.all()
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.username}'
