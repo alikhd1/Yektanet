@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView, RedirectView, CreateView
+from django.views.generic import TemplateView, RedirectView
 
+from advertising.models import EventTracking, Ad
 from user.models import Advertiser
-from .models.ad import Ad
-from .models.tracking import EventTracking
 
 
 class IndexView(TemplateView):
@@ -35,13 +34,3 @@ class AdView(RedirectView):
         self.url = ad.link
 
         return super().get_redirect_url(*args, **kwargs)
-
-
-class NewAdView(CreateView):
-    model = Ad
-    fields = ['advertiser', 'title', 'link', 'img']
-    template_name = 'advertising/new_ad.html'
-    success_url = '../'
-
-    def form_valid(self, form):
-        return super().form_valid(form)
