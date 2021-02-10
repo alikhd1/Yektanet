@@ -13,7 +13,7 @@ class IndexView(TemplateView):
     @classmethod
     def increaseView(cls):
         for advertiser in cls.advertisers:
-            for ad in advertiser.ads:
+            for ad in advertiser.ads.all():
                 tracker = EventTracking(ad=ad, event='vi')
                 tracker.save()
 

@@ -10,7 +10,7 @@ class Ad(models.Model):
     link = models.CharField(verbose_name='لینک', max_length=200)
     img = models.ImageField(verbose_name='عکس', upload_to='ad_pic/')
     creation_date = models.DateTimeField(default=timezone.now)
-    advertiser = models.ForeignKey(Advertiser, verbose_name='تبلیغ دهنده', on_delete=models.CASCADE)
+    advertiser = models.ForeignKey(Advertiser, verbose_name='تبلیغ دهنده', on_delete=models.CASCADE, related_name='ads')
 
     @property
     def image(self):
