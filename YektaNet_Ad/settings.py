@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'advertising.middleware.EventTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'YektaNet_Ad.urls'
